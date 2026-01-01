@@ -1,0 +1,183 @@
+<div class="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Articles</h1>
+        <p class="mt-2 text-sm text-gray-600">
+          @if (articles.length > 0) { Showing {{ articles.length }}
+          {{ articles.length === 1 ? 'article' : 'articles' }}
+          }
+        </p>
+      </div>
+      @if (canCreate) {
+      <button
+        (click)="onCreateArticle()"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition flex items-center gap-2"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Create Article
+      </button>
+      }
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading) {
+    <div class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+    }
+
+    <!-- Error Message -->
+    @if (errorMessage && !isLoading) {
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <p class="text-sm text-red-600">{{ errorMessage }}</p>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading && articles.length === 0 && !errorMessage) {
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">No articles found</h3>
+      <p class="mt-2 text-sm text-gray-500">
+        @if (canCreate) { Get started by creating your first article. } @else { No published
+        articles are available yet. }
+      </p>
+      @if (canCreate) {
+      <button
+        (click)="onCreateArticle()"
+        class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition"
+      >
+        Create Article
+      </button>
+      }
+    </div>
+    }
+
+    <!-- Articles Grid -->
+    @if (!isLoading && articles.length > 0) {
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      @for (article of articles; track article._id) {
+      <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+        <!-- Article Image -->
+        @if (article.image) {
+        <img [src]="article.image" [alt]="article.title" class="w-full h-48 object-cover" />
+        } @else {
+        <div
+          class="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+        >
+          <svg
+            class="w-16 h-16 text-white opacity-50"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </div>
+        }
+
+        <!-- Article Content -->
+        <div class="p-6">
+          <!-- Status Badge -->
+          <span
+            [class]="getStatusBadgeClass(article.isPublished)"
+            class="inline-block px-3 py-1 text-xs font-semibold rounded-full mb-3"
+          >
+            {{ getStatusText(article.isPublished) }}
+          </span>
+
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+            {{ article.title }}
+          </h3>
+
+          <!-- Body Preview -->
+          <p class="text-sm text-gray-600 mb-4 line-clamp-3">
+            {{ article.body }}
+          </p>
+
+          <!-- Meta Info -->
+          <div class="flex items-center text-xs text-gray-500 mb-4">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span class="mr-3">{{ article.author.fullName }}</span>
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <span>{{ formatDate(article.createdAt) }}</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2 flex-wrap">
+            @if (canEdit) {
+            <button
+              (click)="onEditArticle(article._id)"
+              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition"
+            >
+              Edit
+            </button>
+            } @if (canPublish) {
+            <button
+              (click)="onTogglePublish(article)"
+              [class]="
+                article.isPublished
+                  ? 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
+                  : 'bg-green-100 hover:bg-green-200 text-green-800'
+              "
+              class="text-sm font-medium py-2 px-4 rounded-lg transition"
+            >
+              {{ article.isPublished ? 'Unpublish' : 'Publish' }}
+            </button>
+            } @if (canDelete) {
+            <button
+              (click)="onDeleteArticle(article)"
+              class="bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium py-2 px-4 rounded-lg transition"
+            >
+              Delete
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>

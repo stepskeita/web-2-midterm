@@ -1,0 +1,135 @@
+<div class="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">Create Account</h2>
+      <p class="mt-2 text-sm text-gray-600">Join us today! Fill in the details below.</p>
+    </div>
+
+    @if (errorMessage) {
+    <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-sm text-red-600">{{ errorMessage }}</p>
+    </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <div>
+        <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">
+          Full Name
+        </label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          [class.border-red-500]="fullName?.invalid && fullName?.touched"
+          placeholder="Enter your full name"
+        />
+        @if (fullName?.invalid && fullName?.touched) {
+        <p class="mt-1 text-sm text-red-600">
+          @if (fullName?.errors?.['required']) { Full name is required } @if
+          (fullName?.errors?.['minlength']) { Full name must be at least 2 characters }
+        </p>
+        }
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+          Email Address
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          [class.border-red-500]="email?.invalid && email?.touched"
+          placeholder="Enter your email"
+        />
+        @if (email?.invalid && email?.touched) {
+        <p class="mt-1 text-sm text-red-600">
+          @if (email?.errors?.['required']) { Email is required } @if (email?.errors?.['email']) {
+          Please enter a valid email address }
+        </p>
+        }
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          [class.border-red-500]="password?.invalid && password?.touched"
+          placeholder="Enter your password"
+        />
+        @if (password?.invalid && password?.touched) {
+        <p class="mt-1 text-sm text-red-600">
+          @if (password?.errors?.['required']) { Password is required } @if
+          (password?.errors?.['minlength']) { Password must be at least 6 characters }
+        </p>
+        }
+      </div>
+
+      <div>
+        <label for="role" class="block text-sm font-medium text-gray-700 mb-1"> Role </label>
+        @if (isLoadingRoles) {
+        <div class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
+          <p class="text-sm text-gray-500">Loading roles...</p>
+        </div>
+        } @else {
+        <select
+          id="role"
+          formControlName="role"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          [class.border-red-500]="role?.invalid && role?.touched"
+        >
+          <option value="">Select a role</option>
+          @for (roleItem of roles; track roleItem._id) {
+          <option [value]="roleItem._id">{{ roleItem.name }}</option>
+          }
+        </select>
+        } @if (role?.invalid && role?.touched) {
+        <p class="mt-1 text-sm text-red-600">
+          @if (role?.errors?.['required']) { Please select a role }
+        </p>
+        }
+      </div>
+
+      <div>
+        <label for="profilePhoto" class="block text-sm font-medium text-gray-700 mb-1">
+          Profile Photo URL (Optional)
+        </label>
+        <input
+          id="profilePhoto"
+          type="text"
+          formControlName="profilePhoto"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          placeholder="Enter photo URL (optional)"
+        />
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="isLoading || isLoadingRoles"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        @if (isLoading) {
+        <span>Creating Account...</span>
+        } @else {
+        <span>Create Account</span>
+        }
+      </button>
+    </form>
+
+    <div class="mt-6 text-center">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <a routerLink="/auth/login" class="text-blue-600 hover:text-blue-700 font-medium">
+          Sign in here
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
